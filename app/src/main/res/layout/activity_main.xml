@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tl="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp"
+        android:layout_width="match_parent"
+        android:layout_height="184dp"/>
+
+    <com.strongman.tablayout.CommonTabLayout
+        android:id="@+id/tablayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        tl:tl_indicator_color="#2C97DE"
+        tl:tl_textSelectColor="#2C97DE"
+        tl:tl_textUnselectColor="#66000000"
+        tl:tl_underline_color="#DDDDDD"
+        tl:tl_indicator_anim_enable="false"
+        tl:tl_underline_height="1dp"
+        />
+
+
+    <FrameLayout
+       android:id="@+id/fl_change"
+       android:layout_width="match_parent"
+       android:layout_height="84dp">
+   </FrameLayout>
+
+    <com.strongman.tablayout.CommonTabLayout
+        android:id="@+id/tablayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        tl:tl_indicator_color="#2C97DE"
+        tl:tl_textSelectColor="#2C97DE"
+        tl:tl_indicator_height="0dp"
+        tl:tl_textUnselectColor="#66000000"
+        tl:tl_underline_color="#DDDDDD"
+        tl:tl_indicator_anim_enable="false"
+        tl:tl_underline_height="1dp"
+        />
+
+
+    <!-- the tablayout can horizontal scroll -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/scroll_fl"
+            android:layout_width="match_parent"
+            android:layout_height="84dp">
+        </FrameLayout>
+
+        <com.strongman.tablayout.CommonScrollTabLayout
+            android:id="@+id/scroll_tablayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            tl:tl_indicator_color="#2C97DE"
+            tl:tl_textSelectColor="#2C97DE"
+            tl:tl_indicator_height="0dp"
+            tl:tl_textUnselectColor="#66000000"
+            tl:tl_underline_color="#DDDDDD"
+            tl:tl_indicator_anim_enable="false"
+            tl:tl_underline_height="1dp"
+            tl:tl_tab_padding="30dp"
+            />
+
+    </LinearLayout>
+
+
+</LinearLayout>
