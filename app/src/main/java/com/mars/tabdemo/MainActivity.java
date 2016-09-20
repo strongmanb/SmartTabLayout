@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private CommonTabLayout tabLayout2;
     private CommonScrollTabLayout scrollTabLayout;
 
+
     private ViewPager mViewPager;
 
     @Override

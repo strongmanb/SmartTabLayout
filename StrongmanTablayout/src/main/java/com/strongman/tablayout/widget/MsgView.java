@@ -11,7 +11,9 @@ import android.widget.TextView;
 
 import com.strongman.tablayout.R;
 
-/** 用于需要圆角矩形框背景的TextView的情况,减少直接使用TextView时引入的shape资源文件 */
+/**
+ * 用于需要圆角矩形框背景的TextView的情况,减少直接使用TextView时引入的shape资源文件
+ */
 public class MsgView extends TextView {
     private Context context;
     private GradientDrawable gd_background = new GradientDrawable();
