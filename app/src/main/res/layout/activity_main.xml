@@ -18,6 +18,7 @@
         android:background="#ffffff"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
+        tl:tl_msg_textSize="5sp"
         tl:tl_indicator_color="#2C97DE"
         tl:tl_textSelectColor="#2C97DE"
         tl:tl_textUnselectColor="#66000000"
@@ -80,6 +81,21 @@
             />
 
     </LinearLayout>
+
+
+    <com.strongman.tablayout.CommonTabLayout
+        android:id="@+id/tab_layout_3"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@android:color/white"
+        tl:tl_iconVisible="false"
+        tl:tl_indicator_color="#e52b2b"
+        tl:tl_indicator_corner_radius="150dp"
+        tl:tl_indicator_style="BLOCK"
+        tl:tl_indicator_width="80dp"
+        tl:tl_textSelectColor="@android:color/white"
+        tl:tl_textUnselectColor="#838383"
+        tl:tl_textsize="12sp"/>
 
 
 </LinearLayout>

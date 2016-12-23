@@ -135,6 +135,10 @@
         <!-- 设置icon与文字间距 -->
         <attr name="tl_iconMargin" format="dimension"/>
 
+        <!--msg文字大小-->
+        <attr name="tl_msg_textSize" format="dimension"/>
+        <attr name="tl_msg_textColor" format="color" />
+
     </declare-styleable>
 
     <declare-styleable name="MsgView">

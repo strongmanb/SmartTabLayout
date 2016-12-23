@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private CommonTabLayout tabLayout;
     private CommonTabLayout tabLayout2;
+    private CommonTabLayout tabLayout3;
     private CommonScrollTabLayout scrollTabLayout;
 
 
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         tabLayout = (CommonTabLayout) findViewById(R.id.tablayout1);
         tabLayout2 = (CommonTabLayout) findViewById(R.id.tablayout2);
+        tabLayout3 = (CommonTabLayout) findViewById(R.id.tab_layout_3);
         mViewPager = (ViewPager) findViewById(R.id.vp);
         //init fragments
         for (int i=1; i<=mTitles.length; i++) {
@@ -60,6 +62,14 @@ public class MainActivity extends AppCompatActivity {
         initViewPageMode();
         initCommonModel();
         initScrollTabLayout();
+        initBlockTabLayout();
+    }
+
+    private void initBlockTabLayout() {
+        ArrayList<CustomTabEntity> mTabEntities = new ArrayList<>(2);
+        mTabEntities.add(new TabEntity("收件箱", 0, 0));
+        mTabEntities.add(new TabEntity("发件箱", 0, 0));
+        tabLayout3.setTabData(mTabEntities);
     }
 
 
@@ -81,6 +91,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+        tabLayout.showMsg(1, 10);
+        tabLayout.setMsgMargin(1, -9, 0);
+
+        tabLayout.showMsg(2, "new");
+        tabLayout.setMsgMargin(2, -16, 0);
+        tabLayout.setMsgTextSize(2, 12);
 
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override

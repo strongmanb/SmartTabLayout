@@ -3,6 +3,7 @@ package com.strongman.tablayout;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -22,10 +24,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 
 import com.strongman.tablayout.listener.CustomTabEntity;
 import com.strongman.tablayout.listener.OnTabSelectListener;
@@ -35,11 +38,10 @@ import com.strongman.tablayout.widget.MsgView;
 
 import java.util.ArrayList;
 
-
 /**
- * 可左右滑动的TabLayout
+ * 不可滑动TabLayout
  */
-public class CommonScrollTabLayout extends HorizontalScrollView implements ValueAnimator.AnimatorUpdateListener {
+public class CommonTabLayout extends FrameLayout implements ValueAnimator.AnimatorUpdateListener {
     private Context mContext;
     private ArrayList<CustomTabEntity> mTabEntitys = new ArrayList<>();
     private LinearLayout mTabsContainer;
@@ -60,7 +62,6 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
     private int mIndicatorStyle = STYLE_NORMAL;
 
     private float mTabPadding;
-
     private boolean mTabSpaceEqual;
     private float mTabWidth;
 
@@ -77,6 +78,10 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
     private boolean mIndicatorAnimEnable;
     private boolean mIndicatorBounceEnable;
     private int mIndicatorGravity;
+
+    /** msg */
+    private int mMsgTextSize;
+    private ColorStateList mMsgTextColor;
 
     /** underline */
     private int mUnderlineColor;
@@ -107,26 +112,22 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
 
     private int mHeight;
 
-
     /** anim */
     private ValueAnimator mValueAnimator;
     private OvershootInterpolator mInterpolator = new OvershootInterpolator(1.5f);
 
     private FragmentChangeManager mFragmentChangeManager;
 
-    private enum OverflowOperate {
-        SCROLL, WEIGHT
-    }
 
-    public CommonScrollTabLayout(Context context) {
+    public CommonTabLayout(Context context) {
         this(context, null, 0);
     }
 
-    public CommonScrollTabLayout(Context context, AttributeSet attrs) {
+    public CommonTabLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public CommonScrollTabLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CommonTabLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setWillNotDraw(false);//重写onDraw方法,需要调用这个方法来清除flag
         setClipChildren(false);
@@ -196,6 +197,10 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
         mTabSpaceEqual = ta.getBoolean(R.styleable.CommonTabLayout_tl_tab_space_equal, true);
         mTabWidth = ta.getDimension(R.styleable.CommonTabLayout_tl_tab_width, dp2px(-1));
         mTabPadding = ta.getDimension(R.styleable.CommonTabLayout_tl_tab_padding, mTabSpaceEqual || mTabWidth > 0 ? dp2px(0) : dp2px(10));
+
+        mMsgTextSize = ta.getDimensionPixelSize(R.styleable.CommonTabLayout_tl_msg_textSize, 12);
+        mMsgTextColor = ta.getColorStateList(R.styleable.CommonTabLayout_tl_msg_textColor);
+
         ta.recycle();
     }
 
@@ -265,21 +270,11 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
 
         /** 每一个Tab的布局参数 */
         LinearLayout.LayoutParams lp_tab = mTabSpaceEqual ?
-                new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) :
+                new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1.0f) :
                 new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-       /* if(mTabMarginLeft != 0) {
-            lp_tab.leftMargin = (int) mTabMarginLeft;
-        }
-        if(mTabMarginRight != 0) {
-            lp_tab.rightMargin = (int) mTabMarginRight;
-        }*/
         if (mTabWidth > 0) {
             lp_tab = new LinearLayout.LayoutParams((int) mTabWidth, LayoutParams.MATCH_PARENT);
         }
-
-        //View layout = tabView.findViewById(R.id.ll_tap);
-        //layout.setPadding((int)mTabMarginLeft, 0, (int)mTabMarginRight, 0);
-        //tabView.setPadding(100, 5,, 5);
         mTabsContainer.addView(tabView, position, lp_tab);
     }
 
@@ -323,6 +318,14 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
             } else {
                 iv_tab_icon.setVisibility(View.GONE);
             }
+
+            //set message text size
+            MsgView msgView = (MsgView) tabView.findViewById(R.id.rtv_msg_tip);
+            msgView.setTextSize(mMsgTextSize);
+            if (mMsgTextColor != null) {
+                msgView.setTextColor(mMsgTextColor);
+            }
+
         }
     }
 
@@ -469,6 +472,7 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
                     mIndicatorCornerRadius = mIndicatorHeight / 2;
                 }
 
+                
                 mIndicatorDrawable.setColor(mIndicatorColor);
                 mIndicatorDrawable.setBounds(paddingLeft + (int) mIndicatorMarginLeft + mIndicatorRect.left,
                         (int) mIndicatorMarginTop, (int) (paddingLeft + mIndicatorRect.right - mIndicatorMarginRight),
@@ -841,6 +845,40 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
         }
     }
 
+
+    /**
+     * 显示消息
+     * @param position
+     * @param msg
+     */
+    public void showMsg(int position, String msg) {
+        if (position >= mTabCount) {
+            position = mTabCount - 1;
+        }
+        View tabView = mTabsContainer.getChildAt(position);
+        MsgView tipView = (MsgView) tabView.findViewById(R.id.rtv_msg_tip);
+        if (tipView != null) {
+            DisplayMetrics dm = tipView.getResources().getDisplayMetrics();
+            tipView.setVisibility(View.VISIBLE);
+            tipView.setMaxLines(1);
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) tipView.getLayoutParams();
+            lp.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
+            tipView.setPadding((int) (6 * dm.density), 0, (int) (6 * dm.density), (int)(2 * dm.density));
+            tipView.setText(msg);
+
+            if (mInitSetMap.get(position) != null && mInitSetMap.get(position)) {
+                return;
+            }
+
+            /*if (!mIconVisible) {
+                setMsgMargin(position, 2, 2);
+            } else {
+                setMsgMargin(position, 0,
+                        mIconGravity == Gravity.LEFT || mIconGravity == Gravity.RIGHT ? 4 : 0);
+            }*/
+        }
+    }
+
     /**
      * 显示未读红点
      *
@@ -853,6 +891,15 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
         showMsg(position, 0);
     }
 
+
+
+
+
+
+    /**
+     * 隐藏消息
+     * @param position
+     */
     public void hideMsg(int position) {
         if (position >= mTabCount) {
             position = mTabCount - 1;
@@ -864,6 +911,9 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
             tipView.setVisibility(View.GONE);
         }
     }
+
+
+
 
     /**
      * 设置提示红点偏移,注意
@@ -913,6 +963,37 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
         MsgView tipView = (MsgView) tabView.findViewById(R.id.rtv_msg_tip);
         return tipView;
     }
+
+
+    /**
+     * 设置消息的文字大小
+     * @param position
+     * @param size
+     */
+    public void setMsgTextSize(int position, float size) {
+        if (position >= mTabCount) {
+            position = mTabCount - 1;
+        }
+        View tabView = mTabsContainer.getChildAt(position);
+        MsgView tipView = (MsgView) tabView.findViewById(R.id.rtv_msg_tip);
+        tipView.setTextSize(size);
+    }
+
+
+    /**
+     * 设置消息文字颜色
+     * @param position
+     * @param color
+     */
+    public void setMsgTextColor(int position, int color) {
+        if (position >= mTabCount) {
+            position = mTabCount - 1;
+        }
+        View tabView = mTabsContainer.getChildAt(position);
+        MsgView tipView = (MsgView) tabView.findViewById(R.id.rtv_msg_tip);
+        tipView.setTextColor(color);
+    }
+
 
     private OnTabSelectListener mListener;
 

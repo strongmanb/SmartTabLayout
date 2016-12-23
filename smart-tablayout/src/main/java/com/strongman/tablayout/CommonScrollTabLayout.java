@@ -21,11 +21,10 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
-import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 
 import com.strongman.tablayout.listener.CustomTabEntity;
 import com.strongman.tablayout.listener.OnTabSelectListener;
@@ -35,10 +34,11 @@ import com.strongman.tablayout.widget.MsgView;
 
 import java.util.ArrayList;
 
+
 /**
- * 不可滑动TabLayout
+ * 可左右滑动的TabLayout
  */
-public class CommonTabLayout extends FrameLayout implements ValueAnimator.AnimatorUpdateListener {
+public class CommonScrollTabLayout extends HorizontalScrollView implements ValueAnimator.AnimatorUpdateListener {
     private Context mContext;
     private ArrayList<CustomTabEntity> mTabEntitys = new ArrayList<>();
     private LinearLayout mTabsContainer;
@@ -59,6 +59,7 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
     private int mIndicatorStyle = STYLE_NORMAL;
 
     private float mTabPadding;
+
     private boolean mTabSpaceEqual;
     private float mTabWidth;
 
@@ -105,22 +106,26 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
 
     private int mHeight;
 
+
     /** anim */
     private ValueAnimator mValueAnimator;
     private OvershootInterpolator mInterpolator = new OvershootInterpolator(1.5f);
 
     private FragmentChangeManager mFragmentChangeManager;
 
+    private enum OverflowOperate {
+        SCROLL, WEIGHT
+    }
 
-    public CommonTabLayout(Context context) {
+    public CommonScrollTabLayout(Context context) {
         this(context, null, 0);
     }
 
-    public CommonTabLayout(Context context, AttributeSet attrs) {
+    public CommonScrollTabLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public CommonTabLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CommonScrollTabLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setWillNotDraw(false);//重写onDraw方法,需要调用这个方法来清除flag
         setClipChildren(false);
@@ -190,7 +195,6 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
         mTabSpaceEqual = ta.getBoolean(R.styleable.CommonTabLayout_tl_tab_space_equal, true);
         mTabWidth = ta.getDimension(R.styleable.CommonTabLayout_tl_tab_width, dp2px(-1));
         mTabPadding = ta.getDimension(R.styleable.CommonTabLayout_tl_tab_padding, mTabSpaceEqual || mTabWidth > 0 ? dp2px(0) : dp2px(10));
-
         ta.recycle();
     }
 
@@ -260,11 +264,21 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
 
         /** 每一个Tab的布局参数 */
         LinearLayout.LayoutParams lp_tab = mTabSpaceEqual ?
-                new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1.0f) :
+                new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) :
                 new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+       /* if(mTabMarginLeft != 0) {
+            lp_tab.leftMargin = (int) mTabMarginLeft;
+        }
+        if(mTabMarginRight != 0) {
+            lp_tab.rightMargin = (int) mTabMarginRight;
+        }*/
         if (mTabWidth > 0) {
             lp_tab = new LinearLayout.LayoutParams((int) mTabWidth, LayoutParams.MATCH_PARENT);
         }
+
+        //View layout = tabView.findViewById(R.id.ll_tap);
+        //layout.setPadding((int)mTabMarginLeft, 0, (int)mTabMarginRight, 0);
+        //tabView.setPadding(100, 5,, 5);
         mTabsContainer.addView(tabView, position, lp_tab);
     }
 

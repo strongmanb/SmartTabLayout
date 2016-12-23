@@ -12,19 +12,19 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tv_tab_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:singleLine="true"/>
+        android:orientation="vertical"
+        >
 
         <ImageView
             android:id="@+id/iv_tab_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <TextView
+            android:id="@+id/tv_tab_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"/>
     </LinearLayout>
 
     <com.strongman.tablayout.widget.MsgView
@@ -37,6 +37,7 @@
         android:textColor="#ffffff"
         android:textSize="11.5sp"
         android:visibility="gone"
+        android:ellipsize="marquee"
         mv:mv_backgroundColor="#FD481F"
         mv:mv_isRadiusHalfHeight="true"
         mv:mv_strokeColor="#ffffff"
