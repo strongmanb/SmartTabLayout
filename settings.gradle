@@ -1,1 +1,1 @@
-include ':app', ':smart-tablayout'
+include ':app', ':StrongmanTablayout'
