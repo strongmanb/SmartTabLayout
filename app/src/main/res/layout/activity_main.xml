@@ -98,4 +98,40 @@
         tl:tl_textsize="12sp"/>
 
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="←"/>
+
+        <com.strongman.tablayout.SlidingTabLayout
+            android:id="@+id/sliding_tab_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#666666"
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp"
+            tl:tl_indicator_gravity="TOP"
+            tl:tl_indicator_height="0dp"
+            tl:tl_textBold="SELECT"
+            tl:tl_underline_color="#1A000000"
+            tl:tl_underline_gravity="TOP"
+            tl:tl_underline_height="0dp"/>
+
+        <Button
+            android:id="@+id/btn2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="→"/>
+
+    </LinearLayout>
+
+
 </LinearLayout>

@@ -6,14 +6,18 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import com.strongman.tablayout.CommonScrollTabLayout;
 import com.strongman.tablayout.CommonTabLayout;
+import com.strongman.tablayout.SlidingTabLayout;
 import com.strongman.tablayout.listener.CustomTabEntity;
 import com.strongman.tablayout.listener.OnTabSelectListener;
 import com.strongman.tablayout.listener.impl.TabEntity;
 
 import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private CommonTabLayout tabLayout2;
     private CommonTabLayout tabLayout3;
     private CommonScrollTabLayout scrollTabLayout;
+    private SlidingTabLayout slidingTabLayout;
 
 
     private ViewPager mViewPager;
@@ -63,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         initCommonModel();
         initScrollTabLayout();
         initBlockTabLayout();
+        initSlidingTabLayout();
     }
 
     private void initBlockTabLayout() {
@@ -170,6 +176,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void initSlidingTabLayout() {
+        mViewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
+        slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tab_layout);
+        slidingTabLayout.setViewPager(mViewPager);
+        Button left = (Button) findViewById(R.id.btn1);
+        Button right = (Button) findViewById(R.id.btn2);
+        left.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int leftPosition = slidingTabLayout.getCurrentTab() == 0 ? 0 : slidingTabLayout.getCurrentTab() - 1;
+                slidingTabLayout.setCurrentTab(leftPosition);
+            }
+        });
+        right.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int rightPosition = slidingTabLayout.getCurrentTab() == 6 ? 6 : slidingTabLayout.getCurrentTab() + 1;
+                slidingTabLayout.setCurrentTab(rightPosition);
+            }
+        });
+    }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {
         public MyPagerAdapter(FragmentManager fm) {
