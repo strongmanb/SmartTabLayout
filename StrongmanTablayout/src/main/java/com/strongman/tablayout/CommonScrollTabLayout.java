@@ -146,7 +146,7 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
         } else {
             int[] systemAttrs = {android.R.attr.layout_height};
             TypedArray a = context.obtainStyledAttributes(attrs, systemAttrs);
-            mHeight = a.getDimensionPixelSize(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+            mHeight = a.getDimensionPixelSize(0, 0);
             a.recycle();
         }
 
@@ -194,6 +194,7 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
 
         mTabSpaceEqual = ta.getBoolean(R.styleable.CommonTabLayout_tl_tab_space_equal, true);
         mTabWidth = ta.getDimension(R.styleable.CommonTabLayout_tl_tab_width, dp2px(-1));
+        float defaultTabPading = mTabSpaceEqual || mTabWidth > 0 ? dp2px(0) : dp2px(10);
         mTabPadding = ta.getDimension(R.styleable.CommonTabLayout_tl_tab_padding, mTabSpaceEqual || mTabWidth > 0 ? dp2px(0) : dp2px(10));
         ta.recycle();
     }
@@ -266,19 +267,9 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
         LinearLayout.LayoutParams lp_tab = mTabSpaceEqual ?
                 new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) :
                 new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-       /* if(mTabMarginLeft != 0) {
-            lp_tab.leftMargin = (int) mTabMarginLeft;
-        }
-        if(mTabMarginRight != 0) {
-            lp_tab.rightMargin = (int) mTabMarginRight;
-        }*/
         if (mTabWidth > 0) {
             lp_tab = new LinearLayout.LayoutParams((int) mTabWidth, LayoutParams.MATCH_PARENT);
         }
-
-        //View layout = tabView.findViewById(R.id.ll_tap);
-        //layout.setPadding((int)mTabMarginLeft, 0, (int)mTabMarginRight, 0);
-        //tabView.setPadding(100, 5,, 5);
         mTabsContainer.addView(tabView, position, lp_tab);
     }
 
@@ -289,7 +280,6 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
             TextView tv_tab_title = (TextView) tabView.findViewById(R.id.tv_tab_title);
             tv_tab_title.setTextColor(i == mCurrentTab ? mTextSelectColor : mTextUnselectColor);
             tv_tab_title.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextsize);
-//            tv_tab_title.setPadding((int) mTabPadding, 0, (int) mTabPadding, 0);
             if (mTextAllCaps) {
                 tv_tab_title.setText(tv_tab_title.getText().toString().toUpperCase());
             }
@@ -349,8 +339,6 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
         mLastP.left = lastTabView.getLeft();
         mLastP.right = lastTabView.getRight();
 
-//        Log.d("AAA", "mLastP--->" + mLastP.left + "&" + mLastP.right);
-//        Log.d("AAA", "mCurrentP--->" + mCurrentP.left + "&" + mCurrentP.right);
         if (mLastP.left == mCurrentP.left && mLastP.right == mCurrentP.right) {
             invalidate();
         } else {
@@ -375,7 +363,7 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
         mIndicatorRect.left = (int) left;
         mIndicatorRect.right = (int) right;
 
-        if (mIndicatorWidth < 0) {   //indicatorWidth小于0时,原jpardogo's PagerSlidingTabStrip
+        if (mIndicatorWidth < 0) {
 
         } else {//indicatorWidth大于0时,圆角矩形以及三角形
             float indicatorLeft = currentTabView.getLeft() + (currentTabView.getWidth() - mIndicatorWidth) / 2;
@@ -392,7 +380,7 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
         mIndicatorRect.left = (int) p.left;
         mIndicatorRect.right = (int) p.right;
 
-        if (mIndicatorWidth < 0) {   //indicatorWidth小于0时,原jpardogo's PagerSlidingTabStrip
+        if (mIndicatorWidth < 0) {
 
         } else {//indicatorWidth大于0时,圆角矩形以及三角形
             float indicatorLeft = p.left + (currentTabView.getWidth() - mIndicatorWidth) / 2;
@@ -476,11 +464,6 @@ public class CommonScrollTabLayout extends HorizontalScrollView implements Value
                 mIndicatorDrawable.draw(canvas);
             }
         } else {
-               /* mRectPaint.setColor(mIndicatorColor);
-                calcIndicatorRect();
-                canvas.drawRect(getPaddingLeft() + mIndicatorRect.left, getHeight() - mIndicatorHeight,
-                        mIndicatorRect.right + getPaddingLeft(), getHeight(), mRectPaint);*/
-
             if (mIndicatorHeight > 0) {
                 mIndicatorDrawable.setColor(mIndicatorColor);
                 if (mIndicatorGravity == Gravity.BOTTOM) {

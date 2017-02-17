@@ -3,6 +3,8 @@
     <!-- indicator -->
     <!-- 设置显示器颜色 -->
     <attr name="tl_indicator_color" format="color"/>
+    <!-- 设置未选择的显示器颜色 -->
+    <attr name="tl_indicator_unselect_color" format="color" />
     <!-- 设置显示器高度 -->
     <attr name="tl_indicator_height" format="dimension"/>
     <!-- 设置显示器固定宽度 -->
@@ -95,6 +97,7 @@
         <attr name="tl_indicator_anim_enable"/>
         <attr name="tl_indicator_anim_duration"/>
         <attr name="tl_indicator_bounce_enable"/>
+        <attr name="tl_indicator_unselect_color"/>
 
         <!-- underline -->
         <attr name="tl_underline_color"/>
@@ -155,6 +158,7 @@
         <attr name="tl_indicator_gravity"/>
         <attr name="tl_indicator_style"/>
         <attr name="tl_indicator_width_equal_title"/>
+        <attr name="tl_indicator_unselect_color"/>
 
         <!-- underline -->
         <attr name="tl_underline_color"/>

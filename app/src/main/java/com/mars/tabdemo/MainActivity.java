@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<CustomTabEntity> mTabEntities = new ArrayList<>(2);
         mTabEntities.add(new TabEntity("收件箱", 0, 0));
         mTabEntities.add(new TabEntity("发件箱", 0, 0));
+        mTabEntities.add(new TabEntity("发件箱2", 0, 0));
+        mTabEntities.add(new TabEntity("发件箱3", 0, 0));
         tabLayout3.setTabData(mTabEntities);
     }
 
@@ -125,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
         //mViewPager.setOffscreenPageLimit(3);
         mViewPager.setCurrentItem(0);
+
 
     }
 

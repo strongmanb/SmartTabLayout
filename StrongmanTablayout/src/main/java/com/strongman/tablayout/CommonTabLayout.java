@@ -29,7 +29,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-
 import com.strongman.tablayout.listener.CustomTabEntity;
 import com.strongman.tablayout.listener.OnTabSelectListener;
 import com.strongman.tablayout.utils.FragmentChangeManager;
@@ -38,9 +37,6 @@ import com.strongman.tablayout.widget.MsgView;
 
 import java.util.ArrayList;
 
-/**
- * 不可滑动TabLayout
- */
 public class CommonTabLayout extends FrameLayout implements ValueAnimator.AnimatorUpdateListener {
     private Context mContext;
     private ArrayList<CustomTabEntity> mTabEntitys = new ArrayList<>();
@@ -51,7 +47,7 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
     /** 用于绘制显示器 */
     private Rect mIndicatorRect = new Rect();
     private GradientDrawable mIndicatorDrawable = new GradientDrawable();
-
+    private GradientDrawable mUnSelectIndicatorDrawable = new GradientDrawable();
     private Paint mRectPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint mDividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint mTrianglePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -78,6 +74,8 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
     private boolean mIndicatorAnimEnable;
     private boolean mIndicatorBounceEnable;
     private int mIndicatorGravity;
+    private boolean mIsFirstDraw = true;
+    private int mUnSelectedIndicatorColor;
 
     /** msg */
     private int mMsgTextSize;
@@ -142,13 +140,12 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
         //get layout_height
         String height = attrs.getAttributeValue("http://schemas.android.com/apk/res/android", "layout_height");
 
-        //create ViewPager
         if (height.equals(ViewGroup.LayoutParams.MATCH_PARENT + "")) {
         } else if (height.equals(ViewGroup.LayoutParams.WRAP_CONTENT + "")) {
         } else {
             int[] systemAttrs = {android.R.attr.layout_height};
             TypedArray a = context.obtainStyledAttributes(attrs, systemAttrs);
-            mHeight = a.getDimensionPixelSize(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+            mHeight = a.getDimensionPixelSize(0, 0);
             a.recycle();
         }
 
@@ -158,7 +155,6 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
 
     private void obtainAttributes(Context context, AttributeSet attrs) {
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CommonTabLayout);
-
         mIndicatorStyle = ta.getInt(R.styleable.CommonTabLayout_tl_indicator_style, 0);
         mIndicatorColor = ta.getColor(R.styleable.CommonTabLayout_tl_indicator_color, Color.parseColor(mIndicatorStyle == STYLE_BLOCK ? "#4B6A87" : "#ffffff"));
         mIndicatorHeight = ta.getDimension(R.styleable.CommonTabLayout_tl_indicator_height,
@@ -173,6 +169,7 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
         mIndicatorBounceEnable = ta.getBoolean(R.styleable.CommonTabLayout_tl_indicator_bounce_enable, true);
         mIndicatorAnimDuration = ta.getInt(R.styleable.CommonTabLayout_tl_indicator_anim_duration, -1);
         mIndicatorGravity = ta.getInt(R.styleable.CommonTabLayout_tl_indicator_gravity, Gravity.BOTTOM);
+        mUnSelectedIndicatorColor = ta.getColor(R.styleable.CommonTabLayout_tl_indicator_unselect_color, Color.TRANSPARENT);
 
         mUnderlineColor = ta.getColor(R.styleable.CommonTabLayout_tl_underline_color, Color.parseColor("#ffffff"));
         mUnderlineHeight = ta.getDimension(R.styleable.CommonTabLayout_tl_underline_height, dp2px(0));
@@ -208,10 +205,8 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
         if (tabEntitys == null || tabEntitys.size() == 0) {
             throw new IllegalStateException("TabEntitys can not be NULL or EMPTY !");
         }
-
         this.mTabEntitys.clear();
         this.mTabEntitys.addAll(tabEntitys);
-
         notifyDataSetChanged();
     }
 
@@ -285,7 +280,6 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
             TextView tv_tab_title = (TextView) tabView.findViewById(R.id.tv_tab_title);
             tv_tab_title.setTextColor(i == mCurrentTab ? mTextSelectColor : mTextUnselectColor);
             tv_tab_title.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextsize);
-//            tv_tab_title.setPadding((int) mTabPadding, 0, (int) mTabPadding, 0);
             if (mTextAllCaps) {
                 tv_tab_title.setText(tv_tab_title.getText().toString().toUpperCase());
             }
@@ -387,6 +381,8 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
             mIndicatorRect.left = (int) indicatorLeft;
             mIndicatorRect.right = (int) (mIndicatorRect.left + mIndicatorWidth);
         }
+
+
     }
 
     @Override
@@ -407,7 +403,7 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
         invalidate();
     }
 
-    private boolean mIsFirstDraw = true;
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -439,6 +435,7 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
             }
         }
 
+
         //draw indicator line
         if (mIndicatorAnimEnable) {
             if (mIsFirstDraw) {
@@ -461,31 +458,48 @@ public class CommonTabLayout extends FrameLayout implements ValueAnimator.Animat
                 canvas.drawPath(mTrianglePath, mTrianglePaint);
             }
         } else if (mIndicatorStyle == STYLE_BLOCK) {
-            if (mIndicatorHeight < 0) {
+            if (mIndicatorHeight <= 0) {
                 mIndicatorHeight = height - mIndicatorMarginTop - mIndicatorMarginBottom;
-            } else {
-
             }
 
-            if (mIndicatorHeight > 0) {
-                if (mIndicatorCornerRadius < 0 || mIndicatorCornerRadius > mIndicatorHeight / 2) {
-                    mIndicatorCornerRadius = mIndicatorHeight / 2;
+            if (mUnSelectedIndicatorColor != Color.TRANSPARENT) {
+                mUnSelectIndicatorDrawable.setColor(mUnSelectedIndicatorColor);
+                for (int i = 0; i < mTabsContainer.getChildCount(); i++) {
+                    View view = mTabsContainer.getChildAt(i);
+                    float indicatorLeft = view.getLeft() + (view.getWidth() - mIndicatorWidth) / 2;
+                    Rect indicatorRect = new Rect();
+                    indicatorRect.left = (int) indicatorLeft;
+                    indicatorRect.right = (int) (indicatorRect.left + mIndicatorWidth);
+                    if (mIndicatorHeight <= 0) {
+                        mUnSelectIndicatorDrawable.setBounds((int) mIndicatorMarginLeft + indicatorRect.left,
+                                (int)mIndicatorMarginTop, (int) (indicatorRect.right - mIndicatorMarginRight),
+                                (int) (mIndicatorMarginTop + mIndicatorHeight));
+                    } else {
+                        mUnSelectIndicatorDrawable.setBounds((int) mIndicatorMarginLeft + indicatorRect.left,
+                                (int)(height / 2 - mIndicatorHeight / 2), (int) (indicatorRect.right - mIndicatorMarginRight),
+                                (int) (height / 2 - mIndicatorHeight / 2 + mIndicatorHeight));
+                    }
+                    mUnSelectIndicatorDrawable.setCornerRadius(mIndicatorCornerRadius);
+                    mUnSelectIndicatorDrawable.draw(canvas);
                 }
-
-                
-                mIndicatorDrawable.setColor(mIndicatorColor);
-                mIndicatorDrawable.setBounds(paddingLeft + (int) mIndicatorMarginLeft + mIndicatorRect.left,
-                        (int) mIndicatorMarginTop, (int) (paddingLeft + mIndicatorRect.right - mIndicatorMarginRight),
-                        (int) (mIndicatorMarginTop + mIndicatorHeight));
-                mIndicatorDrawable.setCornerRadius(mIndicatorCornerRadius);
-                mIndicatorDrawable.draw(canvas);
             }
-        } else {
-               /* mRectPaint.setColor(mIndicatorColor);
-                calcIndicatorRect();
-                canvas.drawRect(getPaddingLeft() + mIndicatorRect.left, getHeight() - mIndicatorHeight,
-                        mIndicatorRect.right + getPaddingLeft(), getHeight(), mRectPaint);*/
 
+            if (mIndicatorCornerRadius < 0 || mIndicatorCornerRadius > mIndicatorHeight / 2) {
+                mIndicatorCornerRadius = mIndicatorHeight / 2;
+            }
+            mIndicatorDrawable.setColor(mIndicatorColor);
+            mIndicatorDrawable.setCornerRadius(mIndicatorCornerRadius);
+            if (mIndicatorHeight <= 0) {
+                mIndicatorDrawable.setBounds(paddingLeft + (int) mIndicatorMarginLeft + mIndicatorRect.left,
+                        (int)mIndicatorMarginTop, (int) (paddingLeft + mIndicatorRect.right - mIndicatorMarginRight),
+                        (int) (mIndicatorMarginTop + mIndicatorHeight));
+            } else {
+                mIndicatorDrawable.setBounds(paddingLeft + (int) mIndicatorMarginLeft + mIndicatorRect.left,
+                        (int)(height / 2 - mIndicatorHeight / 2), (int) (paddingLeft + mIndicatorRect.right - mIndicatorMarginRight),
+                        (int) (height / 2 - mIndicatorHeight / 2 + mIndicatorHeight));
+            }
+            mIndicatorDrawable.draw(canvas);
+        } else {
             if (mIndicatorHeight > 0) {
                 mIndicatorDrawable.setColor(mIndicatorColor);
                 if (mIndicatorGravity == Gravity.BOTTOM) {

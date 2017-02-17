@@ -50,6 +50,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements ViewPager.
     /** 用于实现滚动居中 */
     private Rect mTabRect = new Rect();
     private GradientDrawable mIndicatorDrawable = new GradientDrawable();
+    private GradientDrawable mUnSelectIndicatorDrawable = new GradientDrawable();
 
     private Paint mRectPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint mDividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -74,6 +75,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements ViewPager.
     private float mIndicatorMarginBottom;
     private int mIndicatorGravity;
     private boolean mIndicatorWidthEqualTitle;
+    private int mUnSelectedIndicatorColor;
 
     private int mUnderlineColor;
     private float mUnderlineHeight;
@@ -148,6 +150,7 @@ public class SlidingTabLayout extends HorizontalScrollView implements ViewPager.
         mIndicatorMarginBottom = ta.getDimension(R.styleable.SlidingTabLayout_tl_indicator_margin_bottom, dp2px(mIndicatorStyle == STYLE_BLOCK ? 7 : 0));
         mIndicatorGravity = ta.getInt(R.styleable.SlidingTabLayout_tl_indicator_gravity, Gravity.BOTTOM);
         mIndicatorWidthEqualTitle = ta.getBoolean(R.styleable.SlidingTabLayout_tl_indicator_width_equal_title, false);
+        mUnSelectedIndicatorColor = ta.getColor(R.styleable.SlidingTabLayout_tl_indicator_unselect_color, Color.TRANSPARENT);
 
         mUnderlineColor = ta.getColor(R.styleable.SlidingTabLayout_tl_underline_color, Color.parseColor("#ffffff"));
         mUnderlineHeight = ta.getDimension(R.styleable.SlidingTabLayout_tl_underline_height, dp2px(0));
@@ -432,9 +435,9 @@ public class SlidingTabLayout extends HorizontalScrollView implements ViewPager.
         mTabRect.left = (int) left;
         mTabRect.right = (int) right;
 
-        if (mIndicatorWidth < 0) {   //indicatorWidth小于0时,原jpardogo's PagerSlidingTabStrip
+        if (mIndicatorWidth < 0) {
 
-        } else {//indicatorWidth大于0时,圆角矩形以及三角形
+        } else {
             float indicatorLeft = currentTabView.getLeft() + (currentTabView.getWidth() - mIndicatorWidth) / 2;
 
             if (this.mCurrentTab < mTabCount - 1) {
@@ -491,24 +494,47 @@ public class SlidingTabLayout extends HorizontalScrollView implements ViewPager.
                 canvas.drawPath(mTrianglePath, mTrianglePaint);
             }
         } else if (mIndicatorStyle == STYLE_BLOCK) {
-            if (mIndicatorHeight < 0) {
+            if (mIndicatorHeight <= 0) {
                 mIndicatorHeight = height - mIndicatorMarginTop - mIndicatorMarginBottom;
-            } else {
-
             }
 
-            if (mIndicatorHeight > 0) {
-                if (mIndicatorCornerRadius < 0 || mIndicatorCornerRadius > mIndicatorHeight / 2) {
-                    mIndicatorCornerRadius = mIndicatorHeight / 2;
+            if (mUnSelectedIndicatorColor != Color.TRANSPARENT) {
+                mUnSelectIndicatorDrawable.setColor(mUnSelectedIndicatorColor);
+                for (int i = 0; i < mTabsContainer.getChildCount(); i++) {
+                    View view = mTabsContainer.getChildAt(i);
+                    float indicatorLeft = view.getLeft() + (view.getWidth() - mIndicatorWidth) / 2;
+                    Rect indicatorRect = new Rect();
+                    indicatorRect.left = (int) indicatorLeft;
+                    indicatorRect.right = (int) (indicatorRect.left + mIndicatorWidth);
+                    if (mIndicatorHeight <= 0) {
+                        mUnSelectIndicatorDrawable.setBounds((int) mIndicatorMarginLeft + indicatorRect.left,
+                                (int)mIndicatorMarginTop, (int) (indicatorRect.right - mIndicatorMarginRight),
+                                (int) (mIndicatorMarginTop + mIndicatorHeight));
+                    } else {
+                        mUnSelectIndicatorDrawable.setBounds((int) mIndicatorMarginLeft + indicatorRect.left,
+                                (int)(height / 2 - mIndicatorHeight / 2), (int) (indicatorRect.right - mIndicatorMarginRight),
+                                (int) (height / 2 - mIndicatorHeight / 2 + mIndicatorHeight));
+                    }
+                    mUnSelectIndicatorDrawable.setCornerRadius(mIndicatorCornerRadius);
+                    mUnSelectIndicatorDrawable.draw(canvas);
                 }
-
-                mIndicatorDrawable.setColor(mIndicatorColor);
-                mIndicatorDrawable.setBounds(paddingLeft + (int) mIndicatorMarginLeft + mIndicatorRect.left,
-                        (int) mIndicatorMarginTop, (int) (paddingLeft + mIndicatorRect.right - mIndicatorMarginRight),
-                        (int) (mIndicatorMarginTop + mIndicatorHeight));
-                mIndicatorDrawable.setCornerRadius(mIndicatorCornerRadius);
-                mIndicatorDrawable.draw(canvas);
             }
+
+            if (mIndicatorCornerRadius < 0 || mIndicatorCornerRadius > mIndicatorHeight / 2) {
+                mIndicatorCornerRadius = mIndicatorHeight / 2;
+            }
+            mIndicatorDrawable.setColor(mIndicatorColor);
+            mIndicatorDrawable.setCornerRadius(mIndicatorCornerRadius);
+            if (mIndicatorHeight <= 0) {
+                mIndicatorDrawable.setBounds(paddingLeft + (int) mIndicatorMarginLeft + mIndicatorRect.left,
+                        (int)mIndicatorMarginTop, (int) (paddingLeft + mIndicatorRect.right - mIndicatorMarginRight),
+                        (int) (mIndicatorMarginTop + mIndicatorHeight));
+            } else {
+                mIndicatorDrawable.setBounds(paddingLeft + (int) mIndicatorMarginLeft + mIndicatorRect.left,
+                        (int)(height / 2 - mIndicatorHeight / 2), (int) (paddingLeft + mIndicatorRect.right - mIndicatorMarginRight),
+                        (int) (height / 2 - mIndicatorHeight / 2 + mIndicatorHeight));
+            }
+            mIndicatorDrawable.draw(canvas);
         } else {
             if (mIndicatorHeight > 0) {
                 mIndicatorDrawable.setColor(mIndicatorColor);
